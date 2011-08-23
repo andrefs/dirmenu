@@ -13,7 +13,7 @@ while [ "$CHOICE" == "NO" ]; do
     # Print the list of options
     for OPTION in "${options[@]}";
 	do 
-		title=$(grep -P '^# title:' "$OPTION" | perl -pe 's/^# title:\s*//')
+		title=$(grep -P '^#\s*title:' "$OPTION" | perl -pe 's/^# title:\s*//')
 		echo "$title";
 		# echo "$OPTION"
 	done |\
@@ -35,9 +35,9 @@ while [ "$CHOICE" == "NO" ]; do
 		fi
 		
 		if [ -f "$OPTION" ]; then
-			./"$OPTION"
+			"$OPTION"
 		elif [ -d "$OPTION" ]; then
-			dirmenu "$OPTION"
+			"$0" "$OPTION"
 		fi
 		CHOICE='YES'
 		;;
