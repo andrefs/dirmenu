@@ -9,6 +9,7 @@ done
 
 CHOICE="NO"
 while [ "$CHOICE" == "NO" ]; do
+	clear
 	echo
     # Print the list of options
     for OPTION in "${options[@]}";
@@ -20,25 +21,29 @@ while [ "$CHOICE" == "NO" ]; do
     nl |\
     perl -plne 's/^\s+(\d+)\s+/ [$1]#/g' |\
     column -s'#' -t
-    read -p "Choose an option: " -e NUMBER
+    read -p "Choose an option: "
+
+	CHOICE=$(echo "$REPLY" | perl -pe 's/^(\d+[A-Za-z]*)\s.*$/\1/')
+	ARGS=$(echo "$REPLY" | perl -pe 's/^\d+[A-Za-z]*\s+(.*)$/\1/')
+
+	NUMBER=$(echo "$CHOICE" | perl -pe 's/^(\d+).*$/\1/')
+	ACTION=$(echo "$CHOICE" | perl -plne 's/^\d+//')
+
+	#echo "CHOICE: '$CHOICE'"
+	#echo "ARGS: '$ARGS'"
+	#echo "NUMBER: '$NUMBER'"
+	#echo "ACTION: '$ACTION'"
 
 	case $NUMBER in
- 	[0-9]|[0-9][0-9]) # Number with one or two digits. 
+	0)
+		exit 0
+		;;
+	"")
+		exit 1
+		;;
+ 	[1-9]|[1-9][0-9]) # Number with one or two digits. 
 		OPTION=$(for opt in ${options[@]}; do echo $opt; done | grep -P '.txt$' | sort | head -$NUMBER | tail -1)
 		OPTION=${OPTION/.txt/}
-		if [ -f "$OPTION.pl" ]; then
-			OPTION="$OPTION.pl"
-		elif [ -f "$OPTION.rb" ]; then
-			OPTION="$OPTION.rb"
-		elif [ -f "$OPTION" ]; then
-			OPTION="$OPTION"
-		fi
-		
-		if [ -f "$OPTION" ]; then
-			"$OPTION"
-		elif [ -d "$OPTION" ]; then
-			"$0" "$OPTION"
-		fi
 		CHOICE='YES'
 		;;
 	*)
@@ -46,5 +51,49 @@ while [ "$CHOICE" == "NO" ]; do
         CHOICE='NO'
         ;;
 	esac
-done
 
+	if [ "$CHOICE"=="YES" ]; then
+		case $ACTION in
+		D|d)
+			grep  -v -P "^#" "$OPTION.txt"
+			CHOICE='NO'
+			;;
+		E|e)
+			if [ -d "$OPTION" ]; then
+        		echo -e "\nCannot edit, it's a submenu!"
+        		CHOICE='NO'				
+			else
+				vim "$OPTION"
+			fi
+			CHOICE='NO'
+			;;
+		ED|ed|Ed|eD)
+			vim "$OPTION.txt"
+			CHOICE='NO'
+			;;
+		C|c)
+			less "$OPTION"
+			CHOICE='NO'
+			;;
+		CD|cd|Cd|cD)
+			less "$OPTION.txt"
+			CHOICE='NO'
+			;;
+		"")
+			if [ -f "$OPTION" ]; then
+            	"$OPTION" "$ARGS"
+            elif [ -d "$OPTION" ]; then
+            	"$0" "$OPTION"
+				if [ $? -eq 0 ]; then
+					exit 0;
+				fi
+            fi
+			CHOICE='NO'
+			;;
+		*)
+    	    echo -e "\nUndefined action '$ACTION'!"
+       		CHOICE='NO'
+        	;;
+		esac
+	fi
+done
