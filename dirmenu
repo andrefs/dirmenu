@@ -3,6 +3,10 @@
 ROOTDIR="$1"
 ROOTDIR=$(echo "$ROOTDIR" | perl -pe 's!/$!!')
 
+if [ -f "$ROOTDIR.txt" ]; then
+	cat "$ROOTDIR.txt"
+fi
+
 for txt in $(ls -1r "$ROOTDIR" | grep -P '.txt$' | sort); do
 	options=(${options[@]-} "$ROOTDIR/$txt")
 done
@@ -79,9 +83,28 @@ while [ "$CHOICE" == "NO" ]; do
 			less "$OPTION.txt"
 			CHOICE='NO'
 			;;
+		A|a)
+			if [ -n "$ARGS" ]; then
+				"$OPTION" $ARGS
+			else
+				printf "%s " $OPTION
+				read ARGS
+				"$OPTION" $ARGS
+			fi
+			;;
+		X|x)
+			if [ -d "$OPTION" ]; then
+        		echo -e "\nInvalid option, it's a submenu!"
+        		CHOICE='NO'				
+			else
+				chmod +x "$OPTION"
+			fi
+			CHOICE='NO'
+			;;
 		"")
 			if [ -f "$OPTION" ]; then
-            	"$OPTION" "$ARGS"
+            	"$OPTION" $ARGS
+				read
             elif [ -d "$OPTION" ]; then
             	"$0" "$OPTION"
 				if [ $? -eq 0 ]; then

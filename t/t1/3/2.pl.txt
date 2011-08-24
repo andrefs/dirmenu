@@ -1,0 +1,3 @@
+# title: This should print the arguments.
+# os: all
+Prints anything passed as argument, each argument in one line.
