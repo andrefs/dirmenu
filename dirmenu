@@ -60,6 +60,7 @@ while [ "$CHOICE" == "NO" ]; do
 		case $ACTION in
 		D|d)
 			grep  -v -P "^#" "$OPTION.txt"
+			read
 			CHOICE='NO'
 			;;
 		E|e)
@@ -74,6 +75,7 @@ while [ "$CHOICE" == "NO" ]; do
 			;;
 		ED|ed|Ed|eD)
 			vim "$OPTION.txt"
+			read
 			CHOICE='NO'
 			;;
 		C|c)
