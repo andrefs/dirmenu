@@ -1,2 +1,3 @@
 # title: This should show a sub menu.
 # os: all
+This is a description for the submenu!
