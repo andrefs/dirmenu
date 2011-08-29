@@ -5,19 +5,19 @@ IFS=$(echo -en "\n\b")
 
 case $1 in
 "")
-	echo "$0 -h to see available options."
+	echo "$0 -h to see available options." >&2
 	exit 1
 	;;
 -h|--help)
-	echo -e "$0 -h#Display this help and exit.\n$0 -i#Install $0 (not yet implemented).\n$0 -u#Update $0 (not yet implemented).\n$0 DIR#Run $0 on directory DIR." | column -s'#' -t
+	echo -e "$0 -h#Display this help and exit.\n$0 -i#Install $0 (not yet implemented).\n$0 -u#Update $0 (not yet implemented).\n$0 DIR#Run $0 on directory DIR." | column -s'#' -t  >&2
 	exit 1
 	;;
 -u|--update)
-	echo "This feature is not yet implemented!"
+	echo "This feature is not yet implemented!" >&2
 	exit 1
 	;;
--i|--intall)
-	echo "This feature is not yet implemented!"
+-i|--install)
+	echo "This feature is not yet implemented!" >&2
 	exit 1
 	;;
 *)
