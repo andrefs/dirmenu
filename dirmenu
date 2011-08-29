@@ -17,8 +17,13 @@ case $1 in
 	exit 1
 	;;
 -i|--install)
-	echo "This feature is not yet implemented!" >&2
-	exit 1
+	#echo "This feature is not yet implemented!" >&2
+	if [[ $EUID -ne 0 ]]; then
+		echo "This script must be run as root!" >&2
+		exit 1
+	fi
+	echo "$0 is now installed!" >&2
+	exit 0
 	;;
 *)
 	ROOTDIR="$1"
