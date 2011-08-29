@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+
 case $1 in
 "")
 	echo "$0 -h to see available options."
@@ -22,6 +25,7 @@ case $1 in
 	ROOTDIR=$(echo "$ROOTDIR" | perl -pe 's!/$!!')
 	;;
 esac
+
 
 for txt in $(ls -1r "$ROOTDIR" | grep -P '.txt$' | sort); do
 	options=(${options[@]-} "$ROOTDIR/$txt")
@@ -146,3 +150,6 @@ while [ "$CHOICE" == "NO" ]; do
 		esac
 	fi
 done
+
+IFS=$SAVEIFS
+

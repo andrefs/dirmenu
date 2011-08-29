@@ -1,0 +1,3 @@
+# title: Esta pasta tem espacos
+# os: all
+
