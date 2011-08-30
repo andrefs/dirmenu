@@ -1,7 +1,9 @@
-#!/bin/bash
-
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
+
+if [ -z "$EDITOR" ]; then
+	EDITOR=/usr/bin/vim
+fi
 
 case $1 in
 "")
@@ -13,18 +15,17 @@ case $1 in
 	exit 1
 	;;
 -u|--update)
-	echo "This feature is not yet implemented!" >&2
-	exit 1
-	;;
--i|--install)
-	#echo "This feature is not yet implemented!" >&2
+	set -e # Exit if any simple command fails
 	if [[ $EUID -ne 0 ]]; then
-		echo "This script must be run as root!" >&2
-		exit 1
+	    echo "This option must be run as root!" 1>&2
 	fi
-	cp $0 /usr/local/bin/dirmenu
-	chmod +x /usr/local/bin/dirmenu
-	echo "$0 is now installed!" >&2
+
+	cd "$DMINSTALLDIR"
+	git pull
+	cd -
+
+	bash "$DMINSTALLDIR"/dirmenu_generate
+	echo "$0 is now updated!" >&2
 	exit 0
 	;;
 *)
@@ -100,12 +101,12 @@ while [ "$CHOICE" == "NO" ]; do
 				read
         		CHOICE='NO'				
 			else
-				vim "$OPTION"
+				"$EDITOR" "$OPTION"
 			fi
 			CHOICE='NO'
 			;;
 		ED|ed|Ed|eD)
-			vim "$OPTION.txt"
+			"$EDITOR" "$OPTION.txt"
 			read
 			CHOICE='NO'
 			;;
