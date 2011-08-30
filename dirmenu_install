@@ -24,5 +24,8 @@ echo "*** Cloning gb-sysmenu Git repository to '$DMINSTALLDIR'..."
 git clone git://github.com/andrefs/dirmenu.git "$DMINSTALLDIR" 2>/dev/null
 
 bash "$DMINSTALLDIR"/dirmenu_generate
+cp "$DMINSTALLDIR"/dirmenu /usr/local/bin/dirmenu
+chmod +x /usr/local/bin/dirmenu
+
 echo "$0 is now installed!" >&2
 

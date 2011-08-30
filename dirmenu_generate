@@ -2,14 +2,12 @@
 
 set -e # Exit if any simple command fails
 
-cat <<- END > /tmp/dirmenu
+cat <<- END > "$DMINSTALLDIR"/dirmenu
 #!/bin/bash
 export DMINSTALLDIR="$DMINSTALLDIR"
 
 END
-cat "$DMINSTALLDIR"/dirmenu.skel >> /tmp/dirmenu
+cat "$DMINSTALLDIR"/dirmenu.skel >> "$DMINSTALLDIR"/dirmenu
 
-mv /tmp/dirmenu /usr/local/bin/dirmenu
-chmod +x /usr/local/bin/dirmenu
 exit 0
 
