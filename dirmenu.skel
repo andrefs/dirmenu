@@ -26,7 +26,10 @@ case $1 in
 	cd -
 
 	bash "$DMINSTALLDIR"/dirmenu_generate
-	echo "$0 is now updated!" >&2
+	cp "$DMINSTALLDIR"/dirmenu /usr/local/bin/dirmenu
+	chmod +x /usr/local/bin/dirmenu
+
+	echo "dirmenu has been updated!" >&2
 	exit 0
 	;;
 *)
