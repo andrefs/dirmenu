@@ -4,6 +4,7 @@ set -e # Exit if any simple command fails
 
 if [[ $EUID -ne 0 ]]; then
 	echo "This script must be run as root!" 1>&2
+	exit 1
 fi
 
 echo "This is the installer script for dirmenu, a bash menu a menu based solely"
@@ -13,7 +14,7 @@ echo "You can find more information about it at http://github.com/andrefs/dirmen
 echo
 
 if [ -z "$DMINSTALLDIR" ]; then
-    DMINSTALLDIR="/opt/dirmenu"
+    export DMINSTALLDIR="/opt/dirmenu"
 fi
 
 echo "*** Creating directory '$DMINSTALLDIR'..."

@@ -18,6 +18,7 @@ case $1 in
 	set -e # Exit if any simple command fails
 	if [[ $EUID -ne 0 ]]; then
 	    echo "This option must be run as root!" 1>&2
+		exit 1
 	fi
 
 	cd "$DMINSTALLDIR"

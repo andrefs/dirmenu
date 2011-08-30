@@ -11,6 +11,6 @@ cat "$DMINSTALLDIR"/dirmenu.skel >> /tmp/dirmenu
 
 mv /tmp/dirmenu /usr/local/bin/dirmenu
 chmod +x /usr/local/bin/dirmenu
-echo "$0 is now installed!" >&2
+echo "dirmenu is now installed!" >&2
 exit 0
 
