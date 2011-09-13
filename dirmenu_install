@@ -27,5 +27,5 @@ bash "$DMINSTALLDIR"/dirmenu_generate
 cp "$DMINSTALLDIR"/dirmenu /usr/local/bin/dirmenu
 chmod +x /usr/local/bin/dirmenu
 
-echo "dirmenu is now installed!" >&2
+echo "dirmenu is now installed!"
 

@@ -1,2 +1,18 @@
 This is a bash application which builds a menu based solely on a given directory's structure and some configuration files.
 (a more complete description is on the way)
+
+INSTALL
+
+You want to install dirmenu? Run the following command and it will
+install itself for you (utils-menu will be installed in /opt/dirmenu)
+
+   curl -L http://goo.gl/rRBCN | sudo bash
+
+If you want to install dirmenu in a different directory, it's easy!
+For example, to install dirmenu at ~/.dirmenu, just run:
+
+   curl -L http://goo.gl/rRBCN | sudo GBINSTALLDIR=~/.dirmenu bash
+  
+For more details about this program, visit http://github.com/andrefs/dirmenu
+
+
