@@ -1,0 +1,167 @@
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+
+if [ -z "$EDITOR" ]; then
+	EDITOR=/usr/bin/vim
+fi
+
+case $1 in
+"")
+	echo "$0 -h to see available options." >&2
+	exit 1
+	;;
+-h|--help)
+	echo -e "$0 -h#Display this help and exit.\n$0 -i#Install $0 (not yet implemented).\n$0 -u#Update $0 (not yet implemented).\n$0 DIR#Run $0 on directory DIR." | column -s'#' -t  >&2
+	exit 1
+	;;
+-u|--update)
+	set -e # Exit if any simple command fails
+	if [[ $EUID -ne 0 ]]; then
+	    echo "This option must be run as root!" 1>&2
+		exit 1
+	fi
+
+	cd "$DMINSTALLDIR"
+	git pull
+	cd -
+
+	bash "$DMINSTALLDIR"/dirmenu_generate
+	cp "$DMINSTALLDIR"/dirmenu /usr/local/bin/dirmenu
+	chmod +x /usr/local/bin/dirmenu
+
+	echo "dirmenu has been updated!" >&2
+	exit 0
+	;;
+*)
+	ROOTDIR="$1"
+	ROOTDIR=$(echo "$ROOTDIR" | perl -pe 's!/$!!')
+	;;
+esac
+
+
+for txt in $(ls -1r "$ROOTDIR" | grep -P '.txt$' | sort); do
+	options=(${options[@]-} "$ROOTDIR/$txt")
+done
+
+CHOICE="NO"
+while [ "$CHOICE" == "NO" ]; do
+	clear
+	if [ -f "$ROOTDIR.txt" ]; then
+		grep  -v -P "^#" "$ROOTDIR.txt"
+	fi
+
+	echo
+    # Print the list of options
+    for OPTION in "${options[@]}";
+	do 
+		title=$(grep -P '^#\s*title:' "$OPTION" | perl -pe 's/^# title:\s*//')
+		echo "$title";
+		# echo "$OPTION"
+	done |\
+    nl |\
+    perl -plne 's/^\s+(\d+)\s+/ [$1]#/g' |\
+    column -s'#' -t
+    read -p "Choose an option: "
+
+	CHOICE=$(echo "$REPLY" | perl -pe 's/^(\d+[A-Za-z]*)\s.*$/\1/')
+	ARGS=$(echo "$REPLY" | perl -pe 's/^\d+[A-Za-z]*\s+(.*)$/\1/')
+
+	NUMBER=$(echo "$CHOICE" | perl -pe 's/^(\d+).*$/\1/')
+	ACTION=$(echo "$CHOICE" | perl -plne 's/^\d+//')
+
+	#echo "CHOICE: '$CHOICE'"
+	#echo "ARGS: '$ARGS'"
+	#echo "NUMBER: '$NUMBER'"
+	#echo "ACTION: '$ACTION'"
+
+	case $NUMBER in
+	0)
+		exit 0
+		;;
+	"")
+		exit 1
+		;;
+ 	[1-9]|[1-9][0-9]) # Number with one or two digits. 
+		OPTION=$(for opt in ${options[@]}; do echo $opt; done | grep -P '.txt$' | sort | head -$NUMBER | tail -1)
+		OPTION=${OPTION/.txt/}
+		CHOICE='YES'
+		;;
+	*)
+        echo -e "\nUndefined option '$NUMBER'!"
+        CHOICE='NO'
+        ;;
+	esac
+
+	if [ "$CHOICE"=="YES" ]; then
+		case $ACTION in
+		D|d)
+			grep  -v -P "^#" "$OPTION.txt"
+			read
+			CHOICE='NO'
+			;;
+		E|e)
+			if [ -d "$OPTION" ]; then
+        		echo -e "\nCannot edit, it's a submenu!"
+				read
+        		CHOICE='NO'				
+			else
+				"$EDITOR" "$OPTION"
+			fi
+			CHOICE='NO'
+			;;
+		ED|ed|Ed|eD)
+			"$EDITOR" "$OPTION.txt"
+			read
+			CHOICE='NO'
+			;;
+		C|c)
+			less "$OPTION"
+			CHOICE='NO'
+			;;
+		CD|cd|Cd|cD)
+			less "$OPTION.txt"
+			CHOICE='NO'
+			;;
+		A|a)
+			if [ -n "$ARGS" ]; then
+				"$OPTION" $ARGS
+			else
+				printf "%s " $OPTION
+				read ARGS
+				"$OPTION" $ARGS
+			fi
+			CHOICE="NO"
+			;;
+		X|x)
+			if [ -d "$OPTION" ]; then
+        		echo -e "\nInvalid option, it's a submenu!"
+				read
+        		CHOICE='NO'				
+			else
+				chmod +x "$OPTION"
+			fi
+			CHOICE='NO'
+			;;
+		"")
+			if [ -f "$OPTION" ]; then
+            	"$OPTION" $ARGS
+				read
+            elif [ -d "$OPTION" ]; then
+            	"$0" "$OPTION"
+				if [ $? -eq 0 ]; then
+					exit 0;
+				fi
+            fi
+			CHOICE='NO'
+			;;
+		*)
+    	    echo -e "\nUndefined action '$ACTION'!"
+			read
+       		CHOICE='NO'
+        	;;
+		esac
+	fi
+done
+
+IFS=$SAVEIFS
+
